@@ -7,7 +7,7 @@ function ProdList({ products }){
   //destructring object = {}  <== putting value in this bracket
   
   return(
-    <div className="flex flex-wrap justify-center gap-2  md:ml-auto -ml-7">
+    <div className="flex flex-wrap justify-center gap-2  ">
 
       {products.map(function(item){
         return(

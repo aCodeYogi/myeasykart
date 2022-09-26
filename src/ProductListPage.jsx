@@ -1,21 +1,27 @@
 import React, { useState, useEffect } from 'react'
 import ProdList from './ProdList'
-import NoMatch from './NoMatch' 
+import NoMatch from './NoMatch'
 import { getProductList } from './api'
-// import allData from './DummyData';
+import Loading from './Loading'
 
 function ProductListPage() {
-  const [productList, setProductList] = useState([]);
-  const [sort, setSort] = useState("default");
+
+  const [productList, setProductList] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [sort, setSort] = useState("default")
   const [querry, setQuerry] = useState("");
 
-  useEffect (function () {
-    const xyz = getProductList()
+  useEffect (function(){
+    const xyz  = getProductList()
 
-    xyz.then(function (response){
-      setProductList(response.data.products)
-    })
+    xyz.then(function(response){ 
+      setProductList(response)
+      setLoading(false)
+    }) 
   }, [])
+
+  // let data = allData;
+  // const [data, setData] = useState(allData)
 
   let data = productList.filter(function(item) {
     const lowerCaseTitle = item.title.toLowerCase()
@@ -52,14 +58,17 @@ function ProductListPage() {
     console.log("sorting", event.target.value)
   }
 
+if(loading){
+  return <Loading />
+}
 
 
 
-
+// fakestore();
   return (
     <div className="">
 
-      <div className="bg-white flex justify-center rounded-md border-2 border-slate-800 h-fit">
+      <div className="bg-white flex justify-center rounded-md border-2 mx-2 border-slate-800 h-fit">
         <img src="https://img.icons8.com/ios-glyphs/452/search--v1.png" className="w-8 h-fit" />
         <input className="border-white rounded-md w-screen" placeholder="SEARCH" type="text" onChange={handleSearch} value={querry} />
       </div>
@@ -77,12 +86,13 @@ function ProductListPage() {
 
 
 
-      {data.length > 0 && <ProdList products={data} /> }
-      {data.length == 0 && <NoMatch /> }
-
+    {data.length > 0 && <ProdList products={data} /> }
+    {data.length == 0 && <NoMatch /> }
+    {}
     </div>
 
-  );
+  )
+  
 
 }
 

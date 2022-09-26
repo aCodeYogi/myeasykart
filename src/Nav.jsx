@@ -1,18 +1,26 @@
 import React from 'react';
 import { Link } from 'react-router-dom'
+import { FaOpencart } from 'react-icons/fa'
+import { VscAccount } from 'react-icons/vsc'
 
 
 
-function Nav() {
+function Nav({ productCount }) {
 
   return (
-    <div class="p-2 flex justify-between items-center bg-orange-200/75">
+    <div className="py-2 md:w-auto w-full flex justify-between items-center bg-orange-200/75">
       <div>
-        <Link to="/"><img src="https://img.icons8.com/color/344/amazon.png" class="md:w-20 w-16" /></Link>
+        <Link to="/"><img src="/imgs/weshop.png" className="md:w-40 w-32 " /></Link>
       </div>
 
 
-      <img src="https://img.icons8.com/ios-filled/344/shopping-cart.png" class="md:w-20 w-16 mr-2" />
+      <div className='flex space-x-4 items-center'>
+        <Link to='log-in'> <VscAccount className='text-4xl text-red-400'/> </Link>
+        <Link to="/Cart" className='flex relative items-center justify-center'>
+          <div className="text-5xl m-2 text-red-400"> <FaOpencart /> </div>
+          <span className='text-red-400 text-lg p-2 rounded-full absolute'>{productCount}</span>
+        </Link>
+      </div>
 
     </div>
   );
