@@ -1,50 +1,40 @@
-import React, {useState, useEffect} from "react";
-import {FaTimes} from "react-icons/fa"
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { ImCross } from "react-icons/im";
 
-function CartRow({thumbnail, title, price, id, quantity}){
+function CartRow({ product, quantity, onQuantityChange, onRemove }) {
+  function handleChange(event) {
+    onQuantityChange(product.id, +event.target.value);
+  }
 
-    const [subTot, setSubTot] = useState(1)
-    function prodDelete(){
-        setSubTot(0)
-    }
+  function handleCrossClick() {
+    onRemove(product.id);
+  }
 
-    function newValue (event){
-        setSubTot(+event.target.value)
-    }
+  function handleMouseEnter() {
+    console.log("handleMouseEnter called");
+  }
 
-    if(subTot == 0){
-        return <div></div>
-    }
-    
-    return(
-        <div>
-            <div>
-                
-                <div className="flex md:flex-row md:w-auto w-44 flex-col justify-between items-center">
-                    <div onClick={prodDelete}>
-                        <FaTimes />
-                    </div>
-
-                    <div className="w-32 h-32 ">
-                        <img src={thumbnail} className="w-full h-full mx-2" />
-                    </div>
-                    <div className="flex flex-col">
-                        <h3 className="text-black font-mono text-lg">{title}</h3>
-                        <h5  className="text-orange-600 font-sans text-md mb-2">₹ {price}</h5>
-                    </div>
-                    <input id="val" type="number" onChange={newValue}  value={subTot} className="border-2 border-orange-600 rounded text-center w-8" />
-                    <h4>{subTot * price}</h4>
-                    <div className="grid items-end">
-                        <Link className="bg-sky-500 p-2 font-RalewayDot rounded-md w-fit h-fit hover:bg-rose-300" to={"/products/" + id} >View</Link>
-                    </div>
-                </div>
-
-                <div className="flex-grow border-t border-gray-400 m-2"></div>
-            </div>
-            
-        </div>
-    )
+  return (
+    <div className="flex flex-row items-center px-4 py-2 space-x-4 border border-gray-300">
+      <span className="flex items-center w-10 h-10">
+        <ImCross onClick={handleCrossClick} onMouseEnter={handleMouseEnter} />
+      </span>
+      <div className="w-10 h-10">
+        <img className="object-cover w-full h-full" src={product.thumbnail} />
+      </div>
+      <h3 className="grow">{product.title}</h3>
+      <span className="w-20">${product.price}</span>
+      <div className="w-32">
+        <input
+          type="number"
+          className="w-12 p-1 mx-2 border border-gray-300 rounded-md"
+          value={quantity}
+          onChange={handleChange}
+        />
+      </div>
+      <span className="w-20">${product.price * quantity}</span>
+    </div>
+  );
 }
 
 export default CartRow;

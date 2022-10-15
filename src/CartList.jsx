@@ -1,26 +1,63 @@
-import React from "react";
+import { template } from "lodash";
+import React, { useState, useEffect } from "react";
+import Button from "./Button";
 import CartRow from "./CartRow";
+import Loading from "./Loading";
+import { withCart } from "./withProvider";
 
-function CartList({product}){
+function CartList({ cart, updateCart }) {
+  const [quantityMap, setQuantityMap] = useState();
 
-    return(
-        <>
-        <h2 className="text-red-400 text-5xl mx-2 font-RalewayDot">my CART</h2>
-        <div className="flex">
-            <div className="m-2 rounded-lg border-2 md:w-11/12 w-auto border-red-400 flex flex-col p-2">
+  const cartToQuantityMap = () =>
+    cart.reduce(
+      (m, cartItem) => ({ ...m, [cartItem.product.id]: cartItem.quantity }),
+      {}
+    );
 
-            {product.map((product) => <CartRow {...product} />)}
+  useEffect(
+    function () {
+      setQuantityMap(cartToQuantityMap());
+    },
+    [cart]
+  );
 
-            </div>
-            <div className="m-2 rounded-lg border-2 border-red-400 flex flex-col md:w-auto w-36 p-2 h-min ">
-                <h1 className="text-red-400 text-xl font-semibold ">Total</h1>
-                <h3 className="text-red-500 text-3xl font-Caveat">${}</h3>
-                <input type="text" className="border-4 border-sky-500 rounded m-2 md:w-full w-20" placeholder="Coupon Code" />
-                <button className="p-2 bg-red-400 hover:bg-sky-500 rounded-md text-base font-Qwitcher">PROCEED TO CHECKOUT</button>
-            </div>
-        </div>
-        </>
-    )
+  function handleQuanityChange(productId, newValue) {
+    const newQuantityMap = { ...quantityMap, [productId]: newValue };
+    setQuantityMap(newQuantityMap);
+  }
+
+  function handeUpdateCartClick() {
+    updateCart(quantityMap);
+  }
+
+  function handleRemove(productId) {
+    const newQuantityMap = cartToQuantityMap();
+    delete newQuantityMap[productId];
+    updateCart(newQuantityMap);
+  }
+
+  return (
+    <div>
+      <div className="flex px-4 py-2 space-x-4 bg-gray-100 border border-gray-300">
+        <span className="ml-28 grow">Product</span>
+        <span className="w-20">Price</span>
+        <span className="w-32">Quantity</span>
+        <span className="w-20">Subtotal</span>
+      </div>
+      {cart.map((cartItem) => (
+        <CartRow
+          key={cartItem.product.id}
+          product={cartItem.product}
+          quantity={quantityMap[cartItem.product.id] || cartItem.quantity}
+          onQuantityChange={handleQuanityChange}
+          onRemove={handleRemove}
+        />
+      ))}
+      <div className="flex justify-end px-4 py-2 border border-gray-300">
+        <Button onClick={handeUpdateCartClick}>Update Cart</Button>
+      </div>
+    </div>
+  );
 }
 
-export default CartList;
+export default withCart(CartList);

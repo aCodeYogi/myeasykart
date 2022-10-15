@@ -1,25 +1,24 @@
-import React from 'react';
-import Product from './Product'
+import React from "react";
+import Product from "./Product";
 
-
-function ProdList({ products }){
-
+function ProdList({ products }) {
   //destructring object = {}  <== putting value in this bracket
-  
-  return(
-    <div className="flex flex-wrap justify-center gap-2  ">
 
-      {products.map(function(item){
-        return(
-          <div className="flex md:flex-row flex-col justify-center">
-        <Product
-          key={item.title}
-          title={item.title}
-          category={item.category}
-          imgUrl={item.imgUrl}
-          price={item.price}
-          {...item}
-          />
+  return (
+    <div className="flex flex-wrap justify-center gap-2 ">
+      {products.map(function (item) {
+        return (
+          <div
+            key={item.id}
+            className="flex flex-col justify-center md:flex-row md:w-3/12"
+          >
+            <Product
+              title={item.title}
+              category={item.category}
+              imgUrl={item.imgUrl}
+              price={item.price}
+              {...item}
+            />
           </div>
         );
       })}
@@ -27,23 +26,3 @@ function ProdList({ products }){
   );
 }
 export default ProdList;
-
-
-
-
-
-
-
-          
-
-          
-
-   
-
-
-
-
-
-
-
-  

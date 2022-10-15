@@ -1,82 +1,87 @@
-import React, { useState, useEffect } from 'react'
-import ProdList from './ProdList'
-import NoMatch from './NoMatch'
-import { getProductList } from './api'
-import Loading from './Loading'
+import React, { useState, useEffect } from "react";
+import ProdList from "./ProdList";
+import NoMatch from "./NoMatch";
+import { getProductList } from "./api";
+import Loading from "./Loading";
+import { range, toQuery } from "lodash";
+import { Link, useSearchParams } from "react-router-dom";
 
 function ProductListPage() {
+  const [productData, setProductData] = useState();
+  const [loading, setLoading] = useState(true);
 
-  const [productList, setProductList] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [sort, setSort] = useState("default")
-  const [querry, setQuerry] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  useEffect (function(){
-    const xyz  = getProductList()
+  const params = Object.fromEntries([...searchParams]);
 
-    xyz.then(function(response){ 
-      setProductList(response)
-      setLoading(false)
-    }) 
-  }, [])
+  let { query, sort, page } = params;
 
-  // let data = allData;
-  // const [data, setData] = useState(allData)
+  query = query || "";
+  sort = sort || "default";
+  page = +page || 1;
 
-  let data = productList.filter(function(item) {
-    const lowerCaseTitle = item.title.toLowerCase()
-    const lowerCaseQuerry = querry.toLowerCase()
+  useEffect(
+    function () {
+      let sortBy;
+      let sortType;
 
-    return lowerCaseTitle.indexOf(lowerCaseQuerry) != -1
-  })
+      if (sort == "title") {
+        sortBy = "title";
+      } else if (sort == "lowToHigh") {
+        sortBy = "price";
+      } else if (sort == "highToLow") {
+        sortBy = "price";
+        sortType = "desc";
+      }
 
-  if (sort === 'lowToHigh') {
-    data.sort(function(x, y) {
-      return x.price - y.price
-    })
-  }
-  else if (sort == "title") {
-    data.sort(function(x, y) {
-      return x.title < y.title ? -1 : 1
-    })
-  }
-  else if (sort == "highToLow") {
-    data.sort(function(x, y) {
-      return y.price - x.price
-    })
-  }
-
+      getProductList(sortBy, query, page, sortType).then(function (xyz) {
+        setProductData(xyz);
+        setLoading(false);
+      });
+    },
+    [sort, query, page]
+  );
 
   function handleSearch(event) {
-    setQuerry(event.target.value)
-    console.log("new data", data)
-
+    setSearchParams(
+      { ...params, query: event.target.value, page: 1 },
+      { replace: false }
+    );
   }
 
   function handleSort(event) {
-    setSort(event.target.value)
-    console.log("sorting", event.target.value)
+    setSearchParams(
+      { ...params, sort: event.target.value },
+      { replace: false }
+    );
   }
 
-if(loading){
-  return <Loading />
-}
+  if (loading) {
+    return <Loading />;
+  }
 
-
-
-// fakestore();
   return (
     <div className="">
-
-      <div className="bg-white flex justify-center rounded-md border-2 mx-2 border-slate-800 h-fit">
-        <img src="https://img.icons8.com/ios-glyphs/452/search--v1.png" className="w-8 h-fit" />
-        <input className="border-white rounded-md w-screen" placeholder="SEARCH" type="text" onChange={handleSearch} value={querry} />
+      <div className="flex justify-center mx-2 bg-white border-2 rounded-md border-slate-800 h-fit">
+        <img
+          src="https://img.icons8.com/ios-glyphs/452/search--v1.png"
+          className="w-8 h-fit"
+        />
+        <input
+          className="w-screen border-white rounded-md"
+          placeholder="SEARCH"
+          type="text"
+          onChange={handleSearch}
+          value={query}
+        />
       </div>
 
       <div className="flex m-2 md:justify-end">
-
-
-        <select value={sort} onChange={handleSort} className="h-fit w-fit border-2 rounded border-emerald-500 m-1 ">
+        <select
+          value={sort}
+          onChange={handleSort}
+          className="m-1 border-2 rounded h-fit w-fit border-emerald-500 "
+        >
           <option value="default">Default Sort</option>
           <option value="title">Sort by Title</option>
           <option value="lowToHigh">Sort by Price: Low to High</option>
@@ -84,16 +89,23 @@ if(loading){
         </select>
       </div>
 
-
-
-    {data.length > 0 && <ProdList products={data} /> }
-    {data.length == 0 && <NoMatch /> }
-    {}
+      {productData.data.length > 0 && <ProdList products={productData.data} />}
+      {productData.data.length == 0 && <NoMatch />}
+      {range(1, productData.meta.last_page + 1).map((pageNo) => (
+        <Link
+          key={pageNo}
+          to={"?" + new URLSearchParams({ ...params, page: pageNo })}
+          className={
+            "p-2 m-1 " + (pageNo === page ? "bg-red-500" : "bg-indigo-700")
+          }
+        >
+          {pageNo}
+        </Link>
+      ))}
     </div>
-
-  )
-  
-
+  );
 }
 
-export default ProductListPage
+export default ProductListPage;
+
+
